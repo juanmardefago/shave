@@ -6,7 +6,7 @@ export default function shave (target, maxHeight, opts = {}) {
   const character = opts.character || '…'
   const classname = opts.classname || 'js-shave'
   const spaces = typeof opts.spaces === 'boolean' ? opts.spaces : true
-  const charHtml = `<span class="js-shave-char">${character}</span>`
+  const charHtml = `<span class="js-shave-char" style="padding: 0;">${character}</span>`
 
   if (!('length' in els)) els = [els]
   for (let i = 0; i < els.length; i += 1) {
@@ -38,11 +38,14 @@ export default function shave (target, maxHeight, opts = {}) {
     styles.height = 'auto'
     const maxHeightStyle = styles.maxHeight
     styles.maxHeight = 'none'
+    const padding = styles.padding
+    styles.padding = '0'
 
     // If already short enough, we're done
     if (el.offsetHeight <= maxHeight) {
       styles.height = heightStyle
       styles.maxHeight = maxHeightStyle
+      styles.padding = padding
       continue
     }
 
@@ -60,6 +63,7 @@ export default function shave (target, maxHeight, opts = {}) {
 
     el[textProp] = spaces ? words.slice(0, max).join(' ') : words.slice(0, max)
     el.insertAdjacentHTML('beforeend', charHtml)
+    el.getElementsByClassName('js-shave-char')[0].setAttribute('style', 'float: none;')
     const diff = spaces ? ` ${words.slice(max).join(' ')}` : words.slice(max)
 
     const shavedText = document.createTextNode(diff)
@@ -71,5 +75,6 @@ export default function shave (target, maxHeight, opts = {}) {
 
     styles.height = heightStyle
     styles.maxHeight = maxHeightStyle
+    styles.padding = padding
   }
 }
