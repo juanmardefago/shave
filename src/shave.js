@@ -3,6 +3,7 @@ export default function shave (target, maxHeight, opts = {}) {
   let els = (typeof target === 'string') ? document.querySelectorAll(target) : target
   if (!els) return
 
+  const trim = typeof opts.trim === 'boolean' ? opts.trim : true
   const character = opts.character || '…'
   const classname = opts.classname || 'js-shave'
   const spaces = typeof opts.spaces === 'boolean' ? opts.spaces : true
@@ -28,6 +29,8 @@ export default function shave (target, maxHeight, opts = {}) {
       // nuke span, recombine text
     }
 
+    if (trim) el[textProp] = el[textProp].trim()
+
     const fullText = el[textProp]
     const words = spaces ? fullText.split(' ') : fullText
     // If 0 or 1 words, we're done
@@ -42,7 +45,7 @@ export default function shave (target, maxHeight, opts = {}) {
     styles.padding = '0'
 
     // If already short enough, we're done
-    if (el.offsetHeight <= maxHeight) {
+    if (el.offsetHeight <= parsedMaxHeight) {
       styles.height = heightStyle
       styles.maxHeight = maxHeightStyle
       styles.padding = padding
