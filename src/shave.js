@@ -3,6 +3,12 @@ export default function shave (target, maxHeight, opts = {}) {
   let els = (typeof target === 'string') ? document.querySelectorAll(target) : target
   if (!els) return
 
+  const maxHeightPercetange = (typeof maxHeight !== 'string')
+    ? 1
+    : maxHeight[maxHeight.length - 1] === '%'
+      ? (parseInt(maxHeight.slice(0, maxHeight.length - 1)) / 100)
+      : 1
+
   const trim = typeof opts.trim === 'boolean' ? opts.trim : true
   const character = opts.character || '…'
   const classname = opts.classname || 'js-shave'
@@ -18,7 +24,7 @@ export default function shave (target, maxHeight, opts = {}) {
     const parsedMaxHeight = (typeof maxHeight === 'number')
       ? maxHeight
       : maxHeight[maxHeight.length - 1] === '%'
-        ? (parseInt(maxHeight.slice(0, maxHeight.length - 1)) / 100) * el.offsetHeight
+        ? (maxHeightPercetange * el.offsetHeight)
         : maxHeight
 
     // If element text has already been shaved
