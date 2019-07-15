@@ -10,17 +10,20 @@ function shave(target, maxHeight) {
   if (!maxHeight) throw Error('maxHeight is required');
   var els = typeof target === 'string' ? document.querySelectorAll(target) : target;
   if (!els) return;
+  var maxHeightPercetange = typeof maxHeight !== 'string' ? 1 : maxHeight[maxHeight.length - 1] === '%' ? parseInt(maxHeight.slice(0, maxHeight.length - 1)) / 100 : 1;
+  var trim = typeof opts.trim === 'boolean' ? opts.trim : true;
   var character = opts.character || '…';
   var classname = opts.classname || 'js-shave';
   var spaces = typeof opts.spaces === 'boolean' ? opts.spaces : true;
-  var charHtml = "<span class=\"js-shave-char\">".concat(character, "</span>");
+  var charHtml = "<span class=\"js-shave-char\" style=\"padding: 0;\">".concat(character, "</span>");
   if (!('length' in els)) els = [els];
 
   for (var i = 0; i < els.length; i += 1) {
     var el = els[i];
     var styles = el.style;
     var span = el.querySelector(".".concat(classname));
-    var textProp = el.textContent === undefined ? 'innerText' : 'textContent'; // If element text has already been shaved
+    var textProp = el.textContent === undefined ? 'innerText' : 'textContent';
+    var parsedMaxHeight = typeof maxHeight === 'number' ? maxHeight : maxHeight[maxHeight.length - 1] === '%' ? maxHeightPercetange * el.offsetHeight : maxHeight; // If element text has already been shaved
 
     if (span) {
       // Remove the ellipsis to recapture the original text
@@ -29,6 +32,7 @@ function shave(target, maxHeight) {
       // nuke span, recombine text
     }
 
+    if (trim) el[textProp] = el[textProp].trim();
     var fullText = el[textProp];
     var words = spaces ? fullText.split(' ') : fullText; // If 0 or 1 words, we're done
 
@@ -39,7 +43,7 @@ function shave(target, maxHeight) {
     var maxHeightStyle = styles.maxHeight;
     styles.maxHeight = 'none'; // If already short enough, we're done
 
-    if (el.offsetHeight <= maxHeight) {
+    if (el.offsetHeight <= parsedMaxHeight) {
       styles.height = heightStyle;
       styles.maxHeight = maxHeightStyle;
       continue;
@@ -55,11 +59,12 @@ function shave(target, maxHeight) {
 
       el[textProp] = spaces ? words.slice(0, pivot).join(' ') : words.slice(0, pivot);
       el.insertAdjacentHTML('beforeend', charHtml);
-      if (el.offsetHeight > maxHeight) max = spaces ? pivot - 1 : pivot - 2;else min = pivot;
+      if (el.offsetHeight > parsedMaxHeight) max = pivot - 1;else min = pivot;
     }
 
     el[textProp] = spaces ? words.slice(0, max).join(' ') : words.slice(0, max);
     el.insertAdjacentHTML('beforeend', charHtml);
+    el.getElementsByClassName('js-shave-char')[0].setAttribute('style', 'float: none;');
     var diff = spaces ? " ".concat(words.slice(max).join(' ')) : words.slice(max);
     var shavedText = document.createTextNode(diff);
     var elWithShavedText = document.createElement('span');

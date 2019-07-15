@@ -47,14 +47,11 @@ export default function shave (target, maxHeight, opts = {}) {
     styles.height = 'auto'
     const maxHeightStyle = styles.maxHeight
     styles.maxHeight = 'none'
-    const padding = styles.padding
-    styles.padding = '0'
 
     // If already short enough, we're done
     if (el.offsetHeight <= parsedMaxHeight) {
       styles.height = heightStyle
       styles.maxHeight = maxHeightStyle
-      styles.padding = padding
       continue
     }
 
@@ -66,7 +63,7 @@ export default function shave (target, maxHeight, opts = {}) {
       pivot = (min + max + 1) >> 1 // eslint-disable-line no-bitwise
       el[textProp] = spaces ? words.slice(0, pivot).join(' ') : words.slice(0, pivot)
       el.insertAdjacentHTML('beforeend', charHtml)
-      if (el.offsetHeight > parsedMaxHeight) max = spaces ? pivot - 1 : pivot - 2
+      if (el.offsetHeight > parsedMaxHeight) max = pivot - 1
       else min = pivot
     }
 
@@ -84,6 +81,5 @@ export default function shave (target, maxHeight, opts = {}) {
 
     styles.height = heightStyle
     styles.maxHeight = maxHeightStyle
-    styles.padding = padding
   }
 }
